@@ -488,9 +488,58 @@ function DietTab({ plans, clientId, show, setShow, onDone }: {
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs text-slate-500 uppercase font-medium">Plan Details</span>
-                          <button onClick={() => { setEditingPlan(plan.id); setEditDetails(details === '{}' ? '' : details); }} className="btn btn-sm btn-secondary">Edit</button>
+                          <div className="flex items-center gap-2">
+                            <Link
+                              href={`/diet-studio?clientId=${clientId}`}
+                              className="btn btn-sm btn-secondary text-xs text-emerald-400 border-emerald-500/30"
+                            >
+                              🎨 Open in Diet Studio
+                            </Link>
+                            <button onClick={() => { setEditingPlan(plan.id); setEditDetails(details === '{}' ? '' : details); }} className="btn btn-sm btn-secondary">Edit Raw</button>
+                          </div>
                         </div>
-                        <pre className="text-sm text-slate-300 whitespace-pre-wrap">{details === '{}' ? 'No details added yet.' : details}</pre>
+
+                        {(() => {
+                          let parsed: any = null;
+                          try {
+                            parsed = typeof plan.plan_details === 'string' ? JSON.parse(plan.plan_details) : plan.plan_details;
+                          } catch {}
+
+                          if (parsed && parsed.meals && Array.isArray(parsed.meals)) {
+                            return (
+                              <div className="p-3 bg-[var(--bg-tertiary)] rounded-xl border border-[var(--border)] space-y-3">
+                                {parsed.stats && (
+                                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border)] pb-2">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-base font-bold text-emerald-400">🔥 {parsed.stats.totalCal} kcal</span>
+                                      <span className="text-xs text-slate-400">
+                                        (P: {parsed.stats.protPct}% • C: {parsed.stats.carbPct}% • F: {parsed.stats.fatPct}%)
+                                      </span>
+                                    </div>
+                                    {parsed.profile?.target_weight && (
+                                      <span className="text-xs text-slate-300">
+                                        Target: <strong>{parsed.profile.target_weight} kg</strong> in {parsed.profile.time_frame_days} days
+                                      </span>
+                                    )}
+                                  </div>
+                                )}
+
+                                <div className="space-y-2">
+                                  {parsed.meals.map((m: any, mIdx: number) => (
+                                    <div key={mIdx} className="text-xs">
+                                      <span className="font-bold text-slate-200">{m.title}: </span>
+                                      <span className="text-slate-300">
+                                        {m.items?.map((it: any) => `${it.name} (${it.portion}x)`).join(', ') || 'No items'}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          return <pre className="text-sm text-slate-300 whitespace-pre-wrap">{details === '{}' ? 'No details added yet.' : details}</pre>;
+                        })()}
                       </div>
                     )}
 

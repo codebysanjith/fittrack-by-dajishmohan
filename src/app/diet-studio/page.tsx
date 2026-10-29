@@ -6,18 +6,26 @@ import Link from 'next/link';
 import nutritionData from '@/lib/nutrition-data.json';
 import { toPng } from 'html-to-image';
 
-interface FoodItem {
+export interface FoodItem {
   id: string;
   name: string;
   portion: number;
   carbs_cal: number;
   protein_cal: number;
   fat_cal: number;
+  base_carbs_cal?: number;
+  base_protein_cal?: number;
+  base_fat_cal?: number;
 }
 
-interface MealSection {
-  title: 'Breakfast' | 'Mid-Day' | 'Lunch' | 'Mid-Afternoon' | 'Dinner';
+export interface MealSection {
+  title: string;
   items: FoodItem[];
+}
+
+export interface InstructionItem {
+  icon: string;
+  text: string;
 }
 
 interface ClientOption {
@@ -29,45 +37,57 @@ interface ClientOption {
   custom_rate?: number;
 }
 
+const defaultInstructions: InstructionItem[] = [
+  { icon: '💧', text: 'Drink water according to your individual needs.' },
+  { icon: '🚫', text: 'Limit sugary foods, bakery items and deep fried foods.' },
+  { icon: '🩺', text: 'Follow medical advice for insulin resistance and any conditions.' },
+  { icon: '🥗', text: 'Include more vegetables and leafy greens in meals.' },
+  { icon: '🏃', text: 'Do exercise as per your medical condition and fitness level.' },
+  { icon: '💊', text: 'Do not change prescribed medication without doctor guidance.' },
+  { icon: '⏰', text: 'Keep regular meal timings.' },
+  { icon: '🛏️', text: 'Aim for 7–8 hours of quality sleep daily.' },
+  { icon: 'ℹ️', text: 'This is a general guide customized for your current phase.' },
+];
+
 const defaultVeenaMeals: MealSection[] = [
   {
     title: 'Breakfast',
     items: [
-      { id: '1', name: 'Vegetable Curry 1 Cup', portion: 0.25, carbs_cal: 24, protein_cal: 5.4, fat_cal: 19.8 },
-      { id: '2', name: 'Ragi Dosa (1 Qty)', portion: 1, carbs_cal: 58.8, protein_cal: 11.2, fat_cal: 36 },
-      { id: '3', name: 'Egg - Whole (1 Qty)', portion: 3, carbs_cal: 7.2, protein_cal: 72, fat_cal: 135 },
-      { id: '4', name: 'Egg  - White (1 Qty)', portion: 3, carbs_cal: 2.4, protein_cal: 43.2, fat_cal: 2.7 },
+      { id: '1', name: 'Vegetable Curry 1 Cup', portion: 0.25, carbs_cal: 24, protein_cal: 5.4, fat_cal: 19.8, base_carbs_cal: 96, base_protein_cal: 21.6, base_fat_cal: 79.2 },
+      { id: '2', name: 'Ragi Dosa (1 Qty)', portion: 1, carbs_cal: 58.8, protein_cal: 11.2, fat_cal: 36, base_carbs_cal: 58.8, base_protein_cal: 11.2, base_fat_cal: 36 },
+      { id: '3', name: 'Egg - Whole (1 Qty)', portion: 3, carbs_cal: 7.2, protein_cal: 72, fat_cal: 135, base_carbs_cal: 2.4, base_protein_cal: 24, base_fat_cal: 45 },
+      { id: '4', name: 'Egg - White (1 Qty)', portion: 3, carbs_cal: 2.4, protein_cal: 43.2, fat_cal: 2.7, base_carbs_cal: 0.8, base_protein_cal: 14.4, base_fat_cal: 0.9 },
     ],
   },
   {
     title: 'Mid-Day',
     items: [
-      { id: '5', name: 'Chiya Seed (10 gms)', portion: 1, carbs_cal: 15, protein_cal: 10.8, fat_cal: 29.25 },
-      { id: '6', name: 'Whey Protein (1 Scoop/32gms)', portion: 1, carbs_cal: 8, protein_cal: 88, fat_cal: 4.5 },
+      { id: '5', name: 'Chiya Seed (10 gms)', portion: 1, carbs_cal: 15, protein_cal: 10.8, fat_cal: 29.25, base_carbs_cal: 15, base_protein_cal: 10.8, base_fat_cal: 29.25 },
+      { id: '6', name: 'Whey Protein (1 Scoop/32gms)', portion: 1, carbs_cal: 8, protein_cal: 88, fat_cal: 4.5, base_carbs_cal: 8, base_protein_cal: 88, base_fat_cal: 4.5 },
     ],
   },
   {
     title: 'Lunch',
     items: [
-      { id: '7', name: 'Brown rice 100 Gm', portion: 1, carbs_cal: 92, protein_cal: 9.2, fat_cal: 7.2 },
-      { id: '8', name: 'Fish Curry 1 Bowl', portion: 0.5, carbs_cal: 9.14, protein_cal: 59, fat_cal: 49.59 },
-      { id: '9', name: 'Leafy Greans 2 Cup', portion: 1, carbs_cal: 12.4, protein_cal: 4.8, fat_cal: 2.7 },
-      { id: '10', name: 'Milk Yoghurt 1 Cup', portion: 1, carbs_cal: 29.6, protein_cal: 30.4, fat_cal: 88.2 },
-      { id: '11', name: 'Egg Omlette (1 Egg)', portion: 1, carbs_cal: 4, protein_cal: 24, fat_cal: 45 },
+      { id: '7', name: 'Brown rice 100 Gm', portion: 1, carbs_cal: 92, protein_cal: 9.2, fat_cal: 7.2, base_carbs_cal: 92, base_protein_cal: 9.2, base_fat_cal: 7.2 },
+      { id: '8', name: 'Fish Curry 1 Bowl', portion: 0.5, carbs_cal: 9.14, protein_cal: 59, fat_cal: 49.59, base_carbs_cal: 18.28, base_protein_cal: 118, base_fat_cal: 99.18 },
+      { id: '9', name: 'Leafy Greens 2 Cup', portion: 1, carbs_cal: 12.4, protein_cal: 4.8, fat_cal: 2.7, base_carbs_cal: 12.4, base_protein_cal: 4.8, base_fat_cal: 2.7 },
+      { id: '10', name: 'Milk Yoghurt 1 Cup', portion: 1, carbs_cal: 29.6, protein_cal: 30.4, fat_cal: 88.2, base_carbs_cal: 29.6, base_protein_cal: 30.4, base_fat_cal: 88.2 },
+      { id: '11', name: 'Egg Omlette (1 Egg)', portion: 1, carbs_cal: 4, protein_cal: 24, fat_cal: 45, base_carbs_cal: 4, base_protein_cal: 24, base_fat_cal: 45 },
     ],
   },
   {
     title: 'Mid-Afternoon',
     items: [
-      { id: '12', name: 'Apple (1 Qty)', portion: 1, carbs_cal: 100, protein_cal: 0, fat_cal: 0 },
-      { id: '13', name: 'Almonds (10 Nos)', portion: 1, carbs_cal: 12, protein_cal: 12, fat_cal: 54 },
+      { id: '12', name: 'Green Apple', portion: 1, carbs_cal: 100, protein_cal: 0, fat_cal: 0, base_carbs_cal: 100, base_protein_cal: 0, base_fat_cal: 0 },
+      { id: '13', name: 'Almonds (10 Nos)', portion: 1, carbs_cal: 12, protein_cal: 12, fat_cal: 54, base_carbs_cal: 12, base_protein_cal: 12, base_fat_cal: 54 },
     ],
   },
   {
     title: 'Dinner',
     items: [
-      { id: '14', name: 'Baked Chicken 100Gm', portion: 2, carbs_cal: 0, protein_cal: 248, fat_cal: 64.8 },
-      { id: '15', name: 'Salad (1 Cup/74 gms)', portion: 3, carbs_cal: 27.6, protein_cal: 7.2, fat_cal: 2.7 },
+      { id: '14', name: 'Chicken Breast (100 g)', portion: 2, carbs_cal: 0, protein_cal: 248, fat_cal: 64.8, base_carbs_cal: 0, base_protein_cal: 124, base_fat_cal: 32.4 },
+      { id: '15', name: 'Salad (1 Cup/74 gms)', portion: 3, carbs_cal: 27.6, protein_cal: 7.2, fat_cal: 2.7, base_carbs_cal: 9.2, base_protein_cal: 2.4, base_fat_cal: 0.9 },
     ],
   },
 ];
@@ -82,26 +102,34 @@ function DietStudioContent() {
   // Client profile & metrics
   const [clientName, setClientName] = useState('Veena MG');
   const [clientPhone, setClientPhone] = useState('+919845011223');
-  const [age, setAge] = useState(41);
-  const [heightCm, setHeightCm] = useState(155);
-  const [weightKg, setWeightKg] = useState(100);
+  const [age, setAge] = useState<number | string>(41);
+  const [heightCm, setHeightCm] = useState<number | string>(155);
+  const [weightKg, setWeightKg] = useState<number | string>(100);
   const [sex, setSex] = useState<'Female' | 'Male'>('Female');
   const [activityLevel, setActivityLevel] = useState('Lightly Active (light exercise 1-3 days / week)');
   const [activityFactor, setActivityFactor] = useState(1.375);
   const [activityType, setActivityType] = useState('gym');
   const [medicalCondition, setMedicalCondition] = useState('insulin resistance');
-  const [targetWeight, setTargetWeight] = useState(60);
-  const [timeFrameDays, setTimeFrameDays] = useState(500);
+  const [targetWeight, setTargetWeight] = useState<number | string>(60);
+  const [timeFrameDays, setTimeFrameDays] = useState<number | string>(500);
 
-  // Meals
+  // Meals & Instructions & Quote
   const [meals, setMeals] = useState<MealSection[]>(defaultVeenaMeals);
+  const [instructions, setInstructions] = useState<InstructionItem[]>(defaultInstructions);
+  const [quote, setQuote] = useState('Consistency in Nutrition and Lifestyle Today Builds a Healthier, Happier You Tomorrow.');
 
   // UI state
   const [toast, setToast] = useState<string | null>(null);
+  const [savingProfile, setSavingProfile] = useState(false);
   const [generatingImg, setGeneratingImg] = useState(false);
-  const [activeTab, setActiveTab] = useState<'preview' | 'builder'>('preview');
+  const [lastSaved, setLastSaved] = useState<string | null>(null);
 
-  // Load clients
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  // Load clients list
   useEffect(() => {
     fetch('/api/clients')
       .then((res) => res.json())
@@ -110,11 +138,12 @@ function DietStudioContent() {
           setClients(data);
           const qId = searchParams.get('clientId');
           if (qId) {
-            const found = data.find((c: ClientOption) => c.id === qId);
-            if (found) {
-              setSelectedClientId(found.id);
-              setClientName(found.name);
-              setClientPhone(found.phone || '');
+            handleClientSelect(qId, data);
+          } else {
+            // Find Veena MG if exists
+            const veena = data.find((c: ClientOption) => c.name.toLowerCase().includes('veena'));
+            if (veena) {
+              setSelectedClientId(veena.id);
             }
           }
         }
@@ -122,42 +151,99 @@ function DietStudioContent() {
       .catch((err) => console.error(err));
   }, [searchParams]);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
-  };
-
-  // Select client from dropdown
-  const handleClientChange = (clientId: string) => {
+  // Load client profile & existing diet plan
+  const handleClientSelect = async (clientId: string, clientList: ClientOption[] = clients) => {
     setSelectedClientId(clientId);
-    const found = clients.find((c) => c.id === clientId);
-    if (found) {
-      setClientName(found.name);
-      setClientPhone(found.phone || '');
-      showToast(`Selected client: ${found.name}`);
+    const found = clientList.find((c) => c.id === clientId);
+    if (!found) return;
+
+    setClientName(found.name);
+    setClientPhone(found.phone || '');
+
+    try {
+      const res = await fetch(`/api/clients/${clientId}`);
+      if (res.ok) {
+        const fullClient = await res.json();
+
+        // 1. Load latest health metrics
+        if (fullClient.health_metrics && fullClient.health_metrics.length > 0) {
+          const latestMetric = fullClient.health_metrics[0];
+          if (latestMetric.weight_kg) setWeightKg(latestMetric.weight_kg);
+          if (latestMetric.height_cm) setHeightCm(latestMetric.height_cm);
+        }
+
+        // 2. Load latest diet plan if saved
+        if (fullClient.diet_plans && fullClient.diet_plans.length > 0) {
+          const activePlan = fullClient.diet_plans[0];
+          try {
+            const parsed = typeof activePlan.plan_details === 'string'
+              ? JSON.parse(activePlan.plan_details)
+              : activePlan.plan_details;
+
+            if (parsed.meals && Array.isArray(parsed.meals)) {
+              setMeals(parsed.meals);
+            }
+            if (parsed.profile) {
+              if (parsed.profile.age) setAge(parsed.profile.age);
+              if (parsed.profile.sex) setSex(parsed.profile.sex);
+              if (parsed.profile.activity_level) setActivityLevel(parsed.profile.activity_level);
+              if (parsed.profile.activity_factor) setActivityFactor(parsed.profile.activity_factor);
+              if (parsed.profile.activity_type) setActivityType(parsed.profile.activity_type);
+              if (parsed.profile.medical_condition) setMedicalCondition(parsed.profile.medical_condition);
+              if (parsed.profile.target_weight) setTargetWeight(parsed.profile.target_weight);
+              if (parsed.profile.time_frame_days) setTimeFrameDays(parsed.profile.time_frame_days);
+            }
+            if (parsed.instructions && Array.isArray(parsed.instructions)) {
+              setInstructions(parsed.instructions);
+            }
+            if (parsed.quote) {
+              setQuote(parsed.quote);
+            }
+            showToast(`Loaded saved diet plan for ${found.name} ✓`);
+            return;
+          } catch (e) {
+            console.error('Failed to parse diet plan JSON', e);
+          }
+        }
+
+        // If Veena MG and no custom plan saved, load her default excel plan
+        if (found.name.toLowerCase().includes('veena')) {
+          loadVeenaPreset();
+        } else {
+          showToast(`Loaded profile for ${found.name} ✓`);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load client details', err);
     }
   };
 
-  // Live Calculations (Formulas matched 1:1 with veena mg diet.xlsm)
+  // Calculations
   const stats = useMemo(() => {
-    const hM = heightCm / 100;
-    const bmi = parseFloat((weightKg / (hM * hM)).toFixed(2));
+    const w = parseFloat(String(weightKg)) || 0;
+    const h = parseFloat(String(heightCm)) || 0;
+    const a = parseFloat(String(age)) || 0;
+    const targetW = parseFloat(String(targetWeight)) || 0;
+    const days = parseFloat(String(timeFrameDays)) || 1;
+
+    const hM = h > 0 ? h / 100 : 1;
+    const bmi = h > 0 && w > 0 ? parseFloat((w / (hM * hM)).toFixed(2)) : 0;
 
     // BMR (Mifflin-St Jeor)
     let bmr = 0;
     if (sex === 'Female') {
-      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+      bmr = 10 * w + 6.25 * h - 5 * a - 161;
     } else {
-      bmr = 10 * weightKg + 6.25 * heightCm - 5 * age + 5;
+      bmr = 10 * w + 6.25 * h - 5 * a + 5;
     }
-    bmr = parseFloat(bmr.toFixed(2));
+    bmr = bmr > 0 ? parseFloat(bmr.toFixed(2)) : 0;
 
     // TDEE
     const tdee = parseFloat((bmr * activityFactor).toFixed(2));
 
     // Rate of loss
-    const totalLossKg = Math.max(0, weightKg - targetWeight);
-    const rateLossPerDay = timeFrameDays > 0 ? parseFloat((totalLossKg / timeFrameDays).toFixed(2)) : 0;
+    const totalLossKg = Math.max(0, w - targetW);
+    const rateLossPerDay = days > 0 ? parseFloat((totalLossKg / days).toFixed(2)) : 0;
     const calLossReqd = parseFloat((rateLossPerDay * 7700).toFixed(2));
 
     // Category
@@ -176,9 +262,9 @@ function DietStudioContent() {
 
     meals.forEach((m) => {
       m.items.forEach((it) => {
-        totalCarbCal += (it.carbs_cal || 0);
-        totalProtCal += (it.protein_cal || 0);
-        totalFatCal += (it.fat_cal || 0);
+        totalCarbCal += parseFloat(String(it.carbs_cal)) || 0;
+        totalProtCal += parseFloat(String(it.protein_cal)) || 0;
+        totalFatCal += parseFloat(String(it.fat_cal)) || 0;
       });
     });
 
@@ -226,6 +312,8 @@ function DietStudioContent() {
     setTargetWeight(60);
     setTimeFrameDays(500);
     setMeals(defaultVeenaMeals);
+    setInstructions(defaultInstructions);
+    setQuote('Consistency in Nutrition and Lifestyle Today Builds a Healthier, Happier You Tomorrow.');
     showToast('Loaded Veena MG Diet Plan Template ✓');
   };
 
@@ -235,32 +323,74 @@ function DietStudioContent() {
     if (!found) return;
 
     setMeals((prev) => {
-      const copy = [...prev];
+      const copy = JSON.parse(JSON.stringify(prev));
       copy[mealIndex].items.push({
-        id: `food_${Date.now()}_${Math.random()}`,
+        id: `food_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
         name: found.name,
         portion: 1,
         carbs_cal: found.carbs_cal,
         protein_cal: found.protein_cal,
         fat_cal: found.fat_cal,
+        base_carbs_cal: found.carbs_cal,
+        base_protein_cal: found.protein_cal,
+        base_fat_cal: found.fat_cal,
       });
       return copy;
     });
-    showToast(`Added ${found.name}`);
+    showToast(`Added ${found.name} to ${meals[mealIndex].title} ✓`);
   };
 
-  // Update food portion
+  // Edit food item name directly
+  const updateFoodName = (mealIndex: number, itemIndex: number, newName: string) => {
+    setMeals((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      copy[mealIndex].items[itemIndex].name = newName;
+      return copy;
+    });
+  };
+
+  // Update food portion (recalculates macros based on base values)
   const updatePortion = (mealIndex: number, itemIndex: number, newPortion: number) => {
     setMeals((prev) => {
-      const copy = [...prev];
+      const copy = JSON.parse(JSON.stringify(prev));
       const it = copy[mealIndex].items[itemIndex];
-      const found = nutritionData.find((n) => n.name === it.name);
-      if (found) {
-        it.portion = newPortion;
-        it.carbs_cal = parseFloat((found.carbs_cal * newPortion).toFixed(2));
-        it.protein_cal = parseFloat((found.protein_cal * newPortion).toFixed(2));
-        it.fat_cal = parseFloat((found.fat_cal * newPortion).toFixed(2));
+      const portion = Math.max(0.1, newPortion);
+
+      // Determine base single-unit calories
+      let baseCarb = it.base_carbs_cal;
+      let baseProt = it.base_protein_cal;
+      let baseFat = it.base_fat_cal;
+
+      if (baseCarb === undefined || baseProt === undefined || baseFat === undefined) {
+        const found = nutritionData.find((n) => n.name.toLowerCase() === it.name.toLowerCase());
+        if (found) {
+          baseCarb = found.carbs_cal;
+          baseProt = found.protein_cal;
+          baseFat = found.fat_cal;
+        } else {
+          baseCarb = it.portion > 0 ? it.carbs_cal / it.portion : it.carbs_cal;
+          baseProt = it.portion > 0 ? it.protein_cal / it.portion : it.protein_cal;
+          baseFat = it.portion > 0 ? it.fat_cal / it.portion : it.fat_cal;
+        }
+        it.base_carbs_cal = baseCarb;
+        it.base_protein_cal = baseProt;
+        it.base_fat_cal = baseFat;
       }
+
+      it.portion = portion;
+      it.carbs_cal = parseFloat((baseCarb * portion).toFixed(2));
+      it.protein_cal = parseFloat((baseProt * portion).toFixed(2));
+      it.fat_cal = parseFloat((baseFat * portion).toFixed(2));
+
+      return copy;
+    });
+  };
+
+  // Update food calories directly
+  const updateCalories = (mealIndex: number, itemIndex: number, field: 'carbs_cal' | 'protein_cal' | 'fat_cal', value: number) => {
+    setMeals((prev) => {
+      const copy = JSON.parse(JSON.stringify(prev));
+      copy[mealIndex].items[itemIndex][field] = value;
       return copy;
     });
   };
@@ -268,10 +398,66 @@ function DietStudioContent() {
   // Remove food item
   const removeFoodItem = (mealIndex: number, itemIndex: number) => {
     setMeals((prev) => {
-      const copy = [...prev];
+      const copy = JSON.parse(JSON.stringify(prev));
       copy[mealIndex].items.splice(itemIndex, 1);
       return copy;
     });
+  };
+
+  // Update instruction text
+  const updateInstructionText = (index: number, newText: string) => {
+    setInstructions((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], text: newText };
+      return copy;
+    });
+  };
+
+  // Save changes to client profile & active diet plan in database
+  const saveToClientProfile = async () => {
+    setSavingProfile(true);
+    try {
+      const res = await fetch('/api/diet-studio/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: selectedClientId,
+          client_name: clientName,
+          client_phone: clientPhone,
+          age: parseInt(String(age)) || 0,
+          sex,
+          height_cm: parseFloat(String(heightCm)) || 0,
+          weight_kg: parseFloat(String(weightKg)) || 0,
+          activity_level: activityLevel,
+          activity_factor: activityFactor,
+          activity_type: activityType,
+          medical_condition: medicalCondition,
+          target_weight: parseFloat(String(targetWeight)) || 0,
+          time_frame_days: parseInt(String(timeFrameDays)) || 0,
+          meals,
+          stats,
+          instructions,
+          quote,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save');
+      }
+
+      const data = await res.json();
+      if (data.client_id && !selectedClientId) {
+        setSelectedClientId(data.client_id);
+      }
+      setLastSaved(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }));
+      showToast(`Saved to ${clientName}'s profile and active diet plan! ✓`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Error saving to profile';
+      showToast(msg);
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   // Download HD Poster Image (PNG)
@@ -281,7 +467,7 @@ function DietStudioContent() {
     try {
       const dataUrl = await toPng(posterRef.current, {
         quality: 1.0,
-        pixelRatio: 2, // 2x Retina resolution for razor-sharp text
+        pixelRatio: 2, // 2x Retina resolution for razor-sharp vector text
       });
       const link = document.createElement('a');
       link.download = `Diet_Plan_${clientName.replace(/\s+/g, '_')}_Dajish_Mohan.png`;
@@ -317,105 +503,158 @@ function DietStudioContent() {
               Diet Studio &amp; Poster Generator
             </h1>
             <span className="badge bg-emerald-500/20 text-emerald-400 font-semibold text-xs">
-              1-Click Infographic
+              Live Real-Time Sync
             </span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
-            Replace Excel &amp; ChatGPT: Build macro plans and export identical, pixel-perfect posters in seconds.
+            Edit anything in the form up top, and it updates the poster below immediately at the exact same time.
           </p>
         </div>
 
-        {/* Top actions */}
+        {/* Action Buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={loadVeenaPreset}
             className="btn btn-sm btn-secondary text-xs"
-            title="Load Veena MG plan from Excel"
+            title="Reset to Veena MG's exact plan from Excel"
           >
             ⚡ Load Veena MG Plan
           </button>
 
           <button
+            onClick={saveToClientProfile}
+            disabled={savingProfile}
+            className="btn btn-sm btn-primary text-xs flex items-center gap-1.5 bg-blue-600 hover:bg-blue-500 shadow-md shadow-blue-600/20"
+          >
+            <span>{savingProfile ? '⏳ Saving...' : '💾 Save to Client Profile'}</span>
+          </button>
+
+          <button
             onClick={downloadPoster}
             disabled={generatingImg}
-            className="btn btn-sm btn-primary text-xs flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/20"
+            className="btn btn-sm btn-primary text-xs flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-600/20"
           >
-            <span>{generatingImg ? '⏳ Generating...' : '📸 Download HD Poster'}</span>
+            <span>{generatingImg ? '⏳ Exporting...' : '📸 Download HD Poster'}</span>
           </button>
 
           <button
             onClick={shareWhatsApp}
             className="btn btn-sm text-xs bg-green-600/20 text-green-400 hover:bg-green-600/30 border border-green-500/30 flex items-center gap-1.5"
           >
-            <span>💬 Send to Client</span>
+            <span>💬 WhatsApp</span>
           </button>
         </div>
       </div>
 
-      {/* Main Grid: Control Panel (Left) & Live Poster (Right) */}
+      {lastSaved && (
+        <div className="p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-xl text-xs text-blue-300 flex items-center justify-between">
+          <span>✓ Profile synced &amp; saved at {lastSaved}</span>
+          {selectedClientId && (
+            <Link href={`/clients/${selectedClientId}`} className="underline font-semibold hover:text-white">
+              View {clientName}&apos;s Profile →
+            </Link>
+          )}
+        </div>
+      )}
+
+      {/* Main Grid: Control Panel (Top/Left) & Live Poster (Bottom/Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Form Controls */}
         <div className="lg:col-span-5 space-y-4">
-          {/* Client Selector & Quick Presets */}
+          {/* Section 1: Client Selector & Profile */}
           <div className="card space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wide">
-                1. Select Client
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
+              <span className="text-xs font-bold text-slate-200 uppercase tracking-wide">
+                1. Client Information
               </span>
-              <span className="text-[11px] text-slate-500">
-                Auto-fills metrics
+              <span className="text-[11px] text-emerald-400 font-medium">
+                Live updates below
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <select
-                value={selectedClientId}
-                onChange={(e) => handleClientChange(e.target.value)}
-                className="input text-xs w-full sm:col-span-2"
-              >
-                <option value="">-- Choose Existing Client --</option>
-                {clients.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name} ({c.phone})
-                  </option>
-                ))}
-              </select>
-
+            <div className="space-y-2.5">
               <div>
-                <label className="text-[10px] text-slate-400 block mb-1">Client Name</label>
-                <input
-                  type="text"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
+                <label className="text-[10px] text-slate-400 block mb-1">Select Client</label>
+                <select
+                  value={selectedClientId}
+                  onChange={(e) => handleClientSelect(e.target.value)}
                   className="input text-xs w-full"
-                />
+                >
+                  <option value="">-- Choose Existing Client --</option>
+                  {clients.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name} ({c.phone || 'No phone'})
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div>
-                <label className="text-[10px] text-slate-400 block mb-1">WhatsApp Phone</label>
-                <input
-                  type="text"
-                  value={clientPhone}
-                  onChange={(e) => setClientPhone(e.target.value)}
-                  className="input text-xs w-full"
-                />
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-1">Client Name</label>
+                  <input
+                    type="text"
+                    value={clientName}
+                    onChange={(e) => setClientName(e.target.value)}
+                    placeholder="e.g. Veena MG"
+                    className="input text-xs w-full"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-1">WhatsApp Phone</label>
+                  <input
+                    type="text"
+                    value={clientPhone}
+                    onChange={(e) => setClientPhone(e.target.value)}
+                    placeholder="+91..."
+                    className="input text-xs w-full"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-1">Target Weight (kg)</label>
+                  <input
+                    type="number"
+                    step="0.5"
+                    value={targetWeight}
+                    onChange={(e) => setTargetWeight(e.target.value)}
+                    className="input text-xs w-full"
+                  />
+                </div>
+                <div>
+                  <label className="text-[10px] text-slate-400 block mb-1">Time Frame (Days)</label>
+                  <input
+                    type="number"
+                    value={timeFrameDays}
+                    onChange={(e) => setTimeFrameDays(e.target.value)}
+                    className="input text-xs w-full"
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Body Stats & Goal (Excel Sheet 2 Data) */}
+          {/* Section 2: Body Stats & Analysis */}
           <div className="card space-y-3">
-            <span className="text-xs font-bold text-slate-300 uppercase tracking-wide block">
-              2. Profile &amp; Body Analysis
-            </span>
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
+              <span className="text-xs font-bold text-slate-200 uppercase tracking-wide">
+                2. Body Stats &amp; Analysis
+              </span>
+              <span className="text-[11px] text-slate-400">
+                Formula-calculated
+              </span>
+            </div>
 
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <label className="text-[10px] text-slate-400 block mb-1">Age (yrs)</label>
+                <label className="text-[10px] text-slate-400 block mb-1">Age (Years)</label>
                 <input
                   type="number"
                   value={age}
-                  onChange={(e) => setAge(parseInt(e.target.value) || 0)}
+                  onChange={(e) => setAge(e.target.value)}
                   className="input text-xs w-full"
                 />
               </div>
@@ -423,8 +662,9 @@ function DietStudioContent() {
                 <label className="text-[10px] text-slate-400 block mb-1">Height (cm)</label>
                 <input
                   type="number"
+                  step="0.5"
                   value={heightCm}
-                  onChange={(e) => setHeightCm(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setHeightCm(e.target.value)}
                   className="input text-xs w-full"
                 />
               </div>
@@ -432,8 +672,9 @@ function DietStudioContent() {
                 <label className="text-[10px] text-slate-400 block mb-1">Weight (kg)</label>
                 <input
                   type="number"
+                  step="0.5"
                   value={weightKg}
-                  onChange={(e) => setWeightKg(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setWeightKg(e.target.value)}
                   className="input text-xs w-full"
                 />
               </div>
@@ -453,7 +694,7 @@ function DietStudioContent() {
               </div>
 
               <div>
-                <label className="text-[10px] text-slate-400 block mb-1">Activity Level</label>
+                <label className="text-[10px] text-slate-400 block mb-1">Activity Multiplier</label>
                 <select
                   value={activityFactor}
                   onChange={(e) => {
@@ -474,25 +715,14 @@ function DietStudioContent() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="text-[10px] text-slate-400 block mb-1">Target Weight (kg)</label>
-                <input
-                  type="number"
-                  value={targetWeight}
-                  onChange={(e) => setTargetWeight(parseFloat(e.target.value) || 0)}
-                  className="input text-xs w-full"
-                />
-              </div>
-              <div>
-                <label className="text-[10px] text-slate-400 block mb-1">Time Frame (Days)</label>
-                <input
-                  type="number"
-                  value={timeFrameDays}
-                  onChange={(e) => setTimeFrameDays(parseInt(e.target.value) || 1)}
-                  className="input text-xs w-full"
-                />
-              </div>
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Activity Level Description (Text on Poster)</label>
+              <input
+                type="text"
+                value={activityLevel}
+                onChange={(e) => setActivityLevel(e.target.value)}
+                className="input text-xs w-full"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-2">
@@ -507,7 +737,7 @@ function DietStudioContent() {
                 />
               </div>
               <div>
-                <label className="text-[10px] text-slate-400 block mb-1">Medical Conditions</label>
+                <label className="text-[10px] text-slate-400 block mb-1">Medical Condition</label>
                 <input
                   type="text"
                   value={medicalCondition}
@@ -518,7 +748,7 @@ function DietStudioContent() {
               </div>
             </div>
 
-            {/* Auto-calc summary pill */}
+            {/* Calculations preview card */}
             <div className="p-3 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-xl text-xs space-y-1">
               <div className="flex justify-between text-slate-300">
                 <span>BMI: <strong className="text-emerald-400">{stats.bmi}</strong> ({stats.category})</span>
@@ -526,21 +756,25 @@ function DietStudioContent() {
               </div>
               <div className="flex justify-between text-slate-300">
                 <span>TDEE: <strong>{stats.tdee}</strong> kcal</span>
-                <span>Calorie Deficit: <strong className="text-amber-400">-{stats.calLossReqd}</strong> kcal</span>
+                <span>Calorie Deficit: <strong className="text-red-400">-{stats.calLossReqd}</strong> kcal</span>
               </div>
             </div>
           </div>
 
-          {/* Meals Manager */}
+          {/* Section 3: Meal Items Manager */}
           <div className="card space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300 uppercase tracking-wide">
-                3. Meal Plans ({stats.totalCal} kcal)
+            <div className="flex items-center justify-between border-b border-[var(--border)] pb-2">
+              <span className="text-xs font-bold text-slate-200 uppercase tracking-wide">
+                3. Meal Plan Foods ({stats.totalCal} kcal)
               </span>
               <span className="text-[11px] text-emerald-400 font-bold">
                 P: {stats.protPct}% • C: {stats.carbPct}% • F: {stats.fatPct}%
               </span>
             </div>
+
+            <p className="text-[11px] text-slate-400">
+              Type directly in the food name or portion fields to customize. Updates immediately on the poster!
+            </p>
 
             <div className="space-y-3">
               {meals.map((meal, mIdx) => (
@@ -561,8 +795,8 @@ function DietStudioContent() {
                       }}
                       defaultValue=""
                     >
-                      <option value="">+ Add Food...</option>
-                      {nutritionData.slice(0, 100).map((f) => (
+                      <option value="">+ Add Food Item...</option>
+                      {nutritionData.slice(0, 150).map((f) => (
                         <option key={f.name} value={f.name}>
                           {f.name}
                         </option>
@@ -570,28 +804,74 @@ function DietStudioContent() {
                     </select>
                   </div>
 
-                  {/* Food Items List */}
+                  {/* Food Items */}
                   <div className="space-y-1.5">
                     {meal.items.map((it, iIdx) => (
-                      <div key={it.id} className="flex items-center justify-between gap-1 text-[11px] bg-[var(--bg-secondary)] px-2 py-1 rounded-lg">
-                        <span className="truncate flex-1 text-slate-300">{it.name}</span>
-                        <div className="flex items-center gap-1 shrink-0">
+                      <div key={it.id} className="p-1.5 bg-[var(--bg-secondary)] rounded-lg border border-[var(--border)] space-y-1">
+                        <div className="flex items-center gap-1.5">
+                          {/* Food Name is an editable input! */}
                           <input
-                            type="number"
-                            step="0.25"
-                            min="0.25"
-                            max="10"
-                            value={it.portion}
-                            onChange={(e) => updatePortion(mIdx, iIdx, parseFloat(e.target.value) || 1)}
-                            className="w-12 text-center text-xs bg-[var(--bg-tertiary)] border border-[var(--border)] rounded px-1 py-0.5"
+                            type="text"
+                            value={it.name}
+                            onChange={(e) => updateFoodName(mIdx, iIdx, e.target.value)}
+                            className="input py-0.5 px-2 text-[11px] flex-1 bg-[var(--bg-tertiary)]"
+                            placeholder="Food name"
                           />
-                          <button
-                            onClick={() => removeFoodItem(mIdx, iIdx)}
-                            className="text-red-400 hover:text-red-300 px-1 text-xs"
-                            title="Remove"
-                          >
-                            ×
-                          </button>
+
+                          {/* Portion */}
+                          <div className="flex items-center gap-1 shrink-0">
+                            <span className="text-[10px] text-slate-500">Portion:</span>
+                            <input
+                              type="number"
+                              step="0.25"
+                              min="0.1"
+                              max="10"
+                              value={it.portion}
+                              onChange={(e) => updatePortion(mIdx, iIdx, parseFloat(e.target.value) || 1)}
+                              className="w-14 text-center text-xs bg-[var(--bg-tertiary)] border border-[var(--border)] rounded px-1 py-0.5"
+                            />
+                            <button
+                              onClick={() => removeFoodItem(mIdx, iIdx)}
+                              className="text-red-400 hover:text-red-300 px-1 text-sm font-bold"
+                              title="Delete food item"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Calories details (editable) */}
+                        <div className="grid grid-cols-3 gap-1 text-[10px] text-slate-400 pt-0.5">
+                          <div className="flex items-center gap-1">
+                            <span>Carb:</span>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={it.carbs_cal}
+                              onChange={(e) => updateCalories(mIdx, iIdx, 'carbs_cal', parseFloat(e.target.value) || 0)}
+                              className="w-12 text-center text-[10px] bg-[var(--bg-tertiary)] border border-[var(--border)] rounded py-0.5"
+                            />
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span>Prot:</span>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={it.protein_cal}
+                              onChange={(e) => updateCalories(mIdx, iIdx, 'protein_cal', parseFloat(e.target.value) || 0)}
+                              className="w-12 text-center text-[10px] bg-[var(--bg-tertiary)] border border-[var(--border)] rounded py-0.5"
+                            />
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span>Fat:</span>
+                            <input
+                              type="number"
+                              step="0.1"
+                              value={it.fat_cal}
+                              onChange={(e) => updateCalories(mIdx, iIdx, 'fat_cal', parseFloat(e.target.value) || 0)}
+                              className="w-12 text-center text-[10px] bg-[var(--bg-tertiary)] border border-[var(--border)] rounded py-0.5"
+                            />
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -600,21 +880,67 @@ function DietStudioContent() {
               ))}
             </div>
           </div>
+
+          {/* Section 4: Instructions & Quote */}
+          <div className="card space-y-3">
+            <span className="text-xs font-bold text-slate-200 uppercase tracking-wide block border-b border-[var(--border)] pb-2">
+              4. Instructions &amp; Quote
+            </span>
+
+            <div className="space-y-1.5">
+              <label className="text-[10px] text-slate-400 block">Common Instructions on Poster</label>
+              {instructions.map((ins, idx) => (
+                <div key={idx} className="flex items-center gap-1.5 text-xs">
+                  <span className="w-5 text-center shrink-0">{ins.icon}</span>
+                  <input
+                    type="text"
+                    value={ins.text}
+                    onChange={(e) => updateInstructionText(idx, e.target.value)}
+                    className="input text-[11px] py-1 px-2 flex-1"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <div>
+              <label className="text-[10px] text-slate-400 block mb-1">Bottom Quote</label>
+              <textarea
+                rows={2}
+                value={quote}
+                onChange={(e) => setQuote(e.target.value)}
+                className="input text-xs w-full"
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Right Column: Live Poster View (Exact match to ChatGPT image) */}
+        {/* Right Column: Live Poster View (Updates Live!) */}
         <div className="lg:col-span-7 flex flex-col items-center">
           <div className="w-full flex items-center justify-between mb-2">
-            <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-              <span>🖼️</span> Generated Infographic Poster
-            </span>
             <div className="flex items-center gap-2">
+              <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                <span>🖼️</span> Generated Infographic Poster
+              </span>
+              <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                ⚡ Live Mirror
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={saveToClientProfile}
+                disabled={savingProfile}
+                className="btn btn-sm btn-primary text-xs py-1 px-3 bg-blue-600 hover:bg-blue-500"
+              >
+                {savingProfile ? '⏳ Saving...' : '💾 Save Changes'}
+              </button>
+
               <button
                 onClick={downloadPoster}
                 disabled={generatingImg}
                 className="btn btn-sm btn-primary text-xs py-1 px-3 bg-emerald-600 hover:bg-emerald-500"
               >
-                {generatingImg ? '⏳ Generating...' : '📸 Save as PNG'}
+                {generatingImg ? '⏳ Exporting...' : '📸 Save PNG'}
               </button>
             </div>
           </div>
@@ -916,49 +1242,19 @@ function DietStudioContent() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-x-2 gap-y-1 text-slate-700 leading-tight">
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">💧</span>
-                    <span>Drink water according to your individual needs.</span>
-                  </div>
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">🚫</span>
-                    <span>Limit sugary foods, bakery items and deep fried foods.</span>
-                  </div>
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">🩺</span>
-                    <span>Follow medical advice for insulin resistance and any conditions.</span>
-                  </div>
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">🥗</span>
-                    <span>Include more vegetables and leafy greens in meals.</span>
-                  </div>
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">🏃</span>
-                    <span>Do exercise as per your medical condition and fitness level.</span>
-                  </div>
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">💊</span>
-                    <span>Do not change prescribed medication without doctor guidance.</span>
-                  </div>
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">⏰</span>
-                    <span>Keep regular meal timings.</span>
-                  </div>
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">🛏️</span>
-                    <span>Aim for 7–8 hours of quality sleep daily.</span>
-                  </div>
-                  <div className="flex items-start gap-1">
-                    <span className="shrink-0">ℹ️</span>
-                    <span>This is a general guide customized for your current phase.</span>
-                  </div>
+                  {instructions.map((ins, idx) => (
+                    <div key={idx} className="flex items-start gap-1">
+                      <span className="shrink-0">{ins.icon}</span>
+                      <span>{ins.text}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
               {/* ─── Footer Quote ─── */}
               <div className="mt-3 text-center pt-2 border-t border-slate-200">
                 <p className="text-[10px] italic text-[#0f2a4a] font-medium tracking-wide">
-                  &ldquo;Consistency in Nutrition and Lifestyle Today Builds a Healthier, Happier You Tomorrow.&rdquo;
+                  &ldquo;{quote}&rdquo;
                 </p>
                 <div className="w-16 h-0.5 bg-emerald-500 mx-auto mt-0.5 rounded-full"></div>
               </div>
