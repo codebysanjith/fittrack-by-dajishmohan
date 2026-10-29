@@ -581,10 +581,10 @@ export default function DashboardPage() {
       </section>
 
       {/* Quick Actions */}
-      <div className="flex gap-3 pb-4">
+      <div className="flex gap-3 pb-4 flex-wrap">
         <button
           onClick={() => router.push('/clients?new=true')}
-          className="btn btn-primary flex-1"
+          className="btn btn-primary flex-1 min-w-[130px]"
         >
           <svg
             className="w-4 h-4"
@@ -601,9 +601,18 @@ export default function DashboardPage() {
           </svg>
           Add Client
         </button>
+
+        <button
+          onClick={() => router.push('/diet-studio')}
+          className="btn btn-secondary flex-1 min-w-[150px] border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 flex items-center justify-center gap-1.5"
+        >
+          <span>🥗</span>
+          <span>Diet Poster Studio</span>
+        </button>
+
         <button
           onClick={() => router.push('/earnings?new=true')}
-          className="btn btn-secondary flex-1"
+          className="btn btn-secondary flex-1 min-w-[130px]"
         >
           <svg
             className="w-4 h-4"

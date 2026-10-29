@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import type { ClientDetail, HealthMetric, DietPlan, Payment, FollowUp } from '@/lib/types';
 
 const formatCurrency = (amount: number) =>
@@ -424,7 +425,13 @@ function DietTab({ plans, clientId, show, setShow, onDone }: {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center gap-2">
+        <Link
+          href={`/diet-studio?clientId=${clientId}`}
+          className="btn btn-sm btn-secondary text-xs flex items-center gap-1.5 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
+        >
+          <span>🎨</span> Open Diet Studio &amp; Poster Generator
+        </Link>
         <button onClick={() => setShow(!show)} className="btn btn-sm btn-primary">{show ? 'Cancel' : '+ Create Plan'}</button>
       </div>
 
