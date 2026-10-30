@@ -5,7 +5,7 @@ import { DietPlan } from '@/lib/types';
 // GET /api/diet-plans/[id] - Get single diet plan
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const db = getDb();
@@ -26,7 +26,7 @@ export async function GET(
 // PUT /api/diet-plans/[id] - Update diet plan, auto-log changes to plan_details
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const db = getDb();
@@ -99,7 +99,7 @@ export async function PUT(
 // DELETE /api/diet-plans/[id] - Delete diet plan
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const db = getDb();

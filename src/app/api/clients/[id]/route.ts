@@ -4,7 +4,7 @@ import { getDb, nowISO } from '@/lib/db';
 // GET /api/clients/[id] - Get single client with all related data
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const db = getDb();
@@ -52,7 +52,7 @@ export async function GET(
 // PUT /api/clients/[id] - Update client fields
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const db = getDb();
@@ -96,7 +96,7 @@ export async function PUT(
 // DELETE /api/clients/[id] - Delete client (cascade deletes related records)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> | { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const db = getDb();
