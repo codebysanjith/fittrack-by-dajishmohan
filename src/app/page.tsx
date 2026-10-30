@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { DashboardStats, FollowUpWithClient, Client, FollowUpType } from '@/lib/types';
+import SingleUseInviteModal from '@/components/SingleUseInviteModal';
 
 interface DashboardData {
   stats: DashboardStats;
@@ -67,6 +68,7 @@ export default function DashboardPage() {
   const [toast, setToast] = useState<string | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [formCopied, setFormCopied] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
 
   const getFormUrl = () => {
     if (typeof window !== 'undefined') {
@@ -239,11 +241,12 @@ export default function DashboardPage() {
             <span>📸 @dajishmohan</span>
           </a>
           <button
-            onClick={copyFormLink}
+            onClick={() => setShowInviteModal(true)}
             className="btn btn-sm btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+            title="Generate Single-Use Intake Link"
           >
-            <span>🔗</span>
-            <span>{formCopied ? '✓ Link Copied!' : 'Share Client Form'}</span>
+            <span>🔒</span>
+            <span>Single-Use Client Form</span>
           </button>
         </div>
       </div>
@@ -253,60 +256,62 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xl shrink-0">
-              📋
+              🔒
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-slate-100">
-                  Shareable Client Intake Link
+                  Dynamic Single-Use Client Intake Links
                 </h3>
                 <span className="badge bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase tracking-wider">
-                  Self Fill-In
+                  Self-Expiring
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Send this link to leads on Instagram DMs or WhatsApp. Clients fill in their details &amp; goals themselves, and their profile, metrics &amp; BMI appear here instantly!
+                Generate a unique one-time link for each client on WhatsApp or Instagram DMs. The link automatically expires once they submit their details, locking in custom rates and preventing link sharing!
               </p>
             </div>
           </div>
 
-          <a
-            href="/onboard"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1 shrink-0 self-start sm:self-center"
-          >
-            <span>Preview Form</span>
-            <span>↗</span>
-          </a>
+          <div className="flex items-center gap-2 shrink-0 self-start sm:self-center">
+            <button
+              onClick={() => setShowInviteModal(true)}
+              className="btn btn-sm btn-primary text-xs py-1.5 px-3 flex items-center gap-1.5"
+            >
+              <span>⚡</span> Generate One-Time Link
+            </button>
+            <a
+              href="/onboard"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-emerald-400 hover:text-emerald-300 font-medium flex items-center gap-1"
+            >
+              <span>Preview</span>
+              <span>↗</span>
+            </a>
+          </div>
         </div>
 
         {/* Link Box & Quick Share Buttons */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-1">
-          <div className="flex-1 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-xl px-3.5 py-2 text-xs font-mono text-emerald-300 truncate select-all">
-            {typeof window !== 'undefined' ? `${window.location.origin}/onboard` : '/onboard'}
+          <div className="flex-1 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-xl px-3.5 py-2 text-xs font-mono text-emerald-300 truncate select-all flex items-center justify-between">
+            <span>🔒 Dynamic Tokens: /onboard?token=fit_...</span>
+            <span className="text-[10px] text-slate-400 font-sans">Single-Use Security</span>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={copyFormLink}
-              className="btn btn-sm btn-primary text-xs py-2 px-3 flex items-center gap-1.5"
+              onClick={() => setShowInviteModal(true)}
+              className="btn btn-sm btn-secondary text-xs py-2 px-3 flex items-center gap-1.5 border-emerald-500/30 text-emerald-400"
             >
-              <span>{formCopied ? '✓ Copied!' : '📋 Copy Link'}</span>
+              <span>📋</span> Manage &amp; Generate Invites
             </button>
 
             <button
-              onClick={shareWhatsApp}
+              onClick={() => setShowInviteModal(true)}
               className="btn btn-sm text-xs py-2 px-3 bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600/30 border border-emerald-500/30 flex items-center gap-1.5"
             >
-              <span>💬 WhatsApp</span>
-            </button>
-
-            <button
-              onClick={shareInstagram}
-              className="btn btn-sm text-xs py-2 px-3 bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 border border-purple-500/30 flex items-center gap-1.5"
-            >
-              <span>📸 Instagram DM</span>
+              <span>💬 WhatsApp Invite</span>
             </button>
           </div>
         </div>
@@ -648,6 +653,14 @@ export default function DashboardPage() {
           Log Payment
         </button>
       </div>
+
+      {/* Single-Use Dynamic Invite Modal */}
+      {showInviteModal && (
+        <SingleUseInviteModal
+          onClose={() => setShowInviteModal(false)}
+          showToast={(msg) => setToast(msg)}
+        />
+      )}
 
       {/* Toast */}
       {toast && <div className="toast">{toast}</div>}

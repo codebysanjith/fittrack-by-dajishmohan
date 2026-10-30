@@ -4,6 +4,9 @@ import { useState, useEffect, useCallback, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { Client, ClientSource, ClientStatus } from "@/lib/types";
+import SingleUseInviteModal from "@/components/SingleUseInviteModal";
+import EditClientModal from "@/components/EditClientModal";
+import DeleteClientModal from "@/components/DeleteClientModal";
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -548,6 +551,9 @@ function ClientsContent() {
   const [viewMode, setViewMode] = useState<"card" | "list">("card");
   const [showModal, setShowModal] = useState(searchParams.get("new") === "true");
   const [showCsvModal, setShowCsvModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [deletingClient, setDeletingClient] = useState<Client | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -702,17 +708,11 @@ function ClientsContent() {
             </div>
 
             <button
-              onClick={() => {
-                if (typeof window !== "undefined") {
-                  const url = `${window.location.origin}/onboard`;
-                  navigator.clipboard.writeText(url);
-                  showToast("Client intake form link copied! 📋 Share on WhatsApp/IG");
-                }
-              }}
+              onClick={() => setShowInviteModal(true)}
               className="btn btn-secondary btn-sm inline-flex items-center gap-1.5 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10"
-              title="Copy shareable client intake link"
+              title="Generate single-use dynamic intake link"
             >
-              <span>🔗</span> Share Form
+              <span>🔒</span> Single-Use Invite
             </button>
 
             <button
@@ -890,6 +890,24 @@ function ClientsContent() {
                           </svg>
                         </button>
                       )}
+
+                      {/* Edit Client */}
+                      <button
+                        onClick={() => setEditingClient(client)}
+                        className="btn-icon text-slate-400 hover:text-emerald-400 p-1.5"
+                        title="Edit client details"
+                      >
+                        ✏️
+                      </button>
+
+                      {/* Delete Client */}
+                      <button
+                        onClick={() => setDeletingClient(client)}
+                        className="btn-icon text-slate-400 hover:text-red-400 p-1.5"
+                        title="Delete client"
+                      >
+                        🗑️
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -995,6 +1013,24 @@ function ClientsContent() {
                               </svg>
                             </button>
                           )}
+
+                          {/* Edit Client */}
+                          <button
+                            onClick={() => setEditingClient(client)}
+                            className="btn-icon text-slate-400 hover:text-emerald-400 p-1.5"
+                            title="Edit client details"
+                          >
+                            ✏️
+                          </button>
+
+                          {/* Delete Client */}
+                          <button
+                            onClick={() => setDeletingClient(client)}
+                            className="btn-icon text-slate-400 hover:text-red-400 p-1.5"
+                            title="Delete client"
+                          >
+                            🗑️
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -1030,6 +1066,34 @@ function ClientsContent() {
             setShowCsvModal(false);
             fetchClients(search, activeTab);
           }}
+          showToast={showToast}
+        />
+      )}
+
+      {/* Dynamic Single-Use Invite Modal */}
+      {showInviteModal && (
+        <SingleUseInviteModal
+          onClose={() => setShowInviteModal(false)}
+          showToast={showToast}
+        />
+      )}
+
+      {/* Edit Client Modal */}
+      {editingClient && (
+        <EditClientModal
+          client={editingClient}
+          onClose={() => setEditingClient(null)}
+          onSaved={() => fetchClients(search, activeTab)}
+          showToast={showToast}
+        />
+      )}
+
+      {/* Delete Client Modal */}
+      {deletingClient && (
+        <DeleteClientModal
+          client={deletingClient}
+          onClose={() => setDeletingClient(null)}
+          onDeleted={() => fetchClients(search, activeTab)}
           showToast={showToast}
         />
       )}

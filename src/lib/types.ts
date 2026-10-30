@@ -107,3 +107,16 @@ export interface EarningsSummary {
   by_month: { month: string; total: number }[];
   recent_payments: (Payment & { client_name: string })[];
 }
+
+export interface InviteToken {
+  id: string;
+  token: string;
+  client_name: string;
+  custom_rate: number;
+  status: 'active' | 'used' | 'expired';
+  created_at: string;
+  expires_at: string;
+  used_at?: string | null;
+  used_by_client_id?: string | null;
+  used_by_client_name?: string | null;
+}

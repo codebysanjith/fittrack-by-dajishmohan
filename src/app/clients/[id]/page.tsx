@@ -68,6 +68,22 @@ export default function ClientDetailPage() {
     if (toast) { const t = setTimeout(() => setToast(null), 2500); return () => clearTimeout(t); }
   }, [toast]);
 
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteClient = async () => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/clients/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete');
+      router.push('/clients');
+    } catch {
+      showToast('Failed to delete client');
+      setDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   const showToast = (msg: string) => setToast(msg);
 
   const updateStatus = async (status: string) => {
@@ -165,11 +181,20 @@ export default function ClientDetailPage() {
 
       {/* Contact Info Card */}
       <div className="card">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
           <h3 className="font-semibold text-slate-200">Contact & Rate Details</h3>
-          <button onClick={() => setShowEditInfo(!showEditInfo)} className="btn btn-sm btn-secondary">
-            {showEditInfo ? 'Cancel' : 'Edit Info'}
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowEditInfo(!showEditInfo)} className="btn btn-sm btn-secondary">
+              {showEditInfo ? 'Cancel' : '✏️ Edit Info'}
+            </button>
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="btn btn-sm bg-red-500/15 text-red-400 hover:bg-red-500/25 border border-red-500/30"
+              title="Delete client"
+            >
+              🗑️ Delete Client
+            </button>
+          </div>
         </div>
         {showEditInfo ? (
           <EditInfoForm client={client} onSave={() => { setShowEditInfo(false); fetchClient(); showToast('Updated!'); }} />
@@ -229,6 +254,47 @@ export default function ClientDetailPage() {
       {tab === 'diet' && <DietTab plans={client.diet_plans} clientId={id} show={showDietForm} setShow={setShowDietForm} onDone={() => { fetchClient(); showToast('Saved!'); }} />}
       {tab === 'payments' && <PaymentsTab payments={client.payments} totalPaid={client.total_paid} clientId={id} show={showPaymentForm} setShow={setShowPaymentForm} onDone={() => { fetchClient(); showToast('Payment logged!'); }} />}
       {tab === 'followups' && <FollowUpsTab followUps={client.follow_ups} clientId={id} show={showFollowUpForm} setShow={setShowFollowUpForm} onDone={() => { fetchClient(); showToast('Updated!'); }} />}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="modal-overlay" onClick={() => !deleting && setShowDeleteConfirm(false)}>
+          <div className="modal-content animate-in max-w-md" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-red-400 flex items-center gap-2">
+                <span>⚠️</span> Delete Client
+              </h2>
+              <button
+                onClick={() => !deleting && setShowDeleteConfirm(false)}
+                className="btn-icon text-slate-400 hover:text-slate-200"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-slate-300 text-sm mb-4 leading-relaxed">
+              Are you sure you want to permanently delete <strong className="text-slate-100">{client.name}</strong>?
+              This will remove all associated health metrics, diet plans, follow-ups, and payment records. This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-3 pt-3 border-t border-[var(--border)]">
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleting}
+                className="btn btn-secondary text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteClient}
+                disabled={deleting}
+                className="btn bg-red-600 hover:bg-red-700 text-white font-medium text-sm flex items-center gap-1.5"
+              >
+                {deleting ? 'Deleting...' : '🗑️ Delete Permanently'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {toast && <div className="toast">{toast}</div>}
     </div>

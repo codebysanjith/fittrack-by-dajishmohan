@@ -1,12 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 type FitnessGoal = 'fat_loss' | 'muscle_gain' | 'recomposition' | 'general_health';
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'very_active';
 type DietType = 'non_veg' | 'veg' | 'eggetarian' | 'vegan';
 
-export default function ClientOnboardPage() {
+function OnboardContent() {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+
+  // Token validation state
+  const [tokenStatus, setTokenStatus] = useState<'checking' | 'valid' | 'used' | 'expired' | 'invalid' | 'missing'>('checking');
+  const [tokenError, setTokenError] = useState('');
+  const [customRate, setCustomRate] = useState<number>(2500);
+
   // Form fields
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -33,6 +42,33 @@ export default function ClientOnboardPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Validate token on mount
+  useEffect(() => {
+    if (!token) {
+      setTokenStatus('missing');
+      return;
+    }
+
+    fetch(`/api/invites/validate?token=${encodeURIComponent(token)}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (res.ok && data.valid) {
+          setTokenStatus('valid');
+          if (data.client_name) setName(data.client_name);
+          if (data.custom_rate) setCustomRate(data.custom_rate);
+        } else {
+          if (data.reason === 'already_used') setTokenStatus('used');
+          else if (data.reason === 'expired') setTokenStatus('expired');
+          else setTokenStatus('invalid');
+          setTokenError(data.message || 'Invitation link is no longer active.');
+        }
+      })
+      .catch(() => {
+        setTokenStatus('invalid');
+        setTokenError('Unable to verify invitation link. Please check your connection.');
+      });
+  }, [token]);
 
   // Live BMI calculation
   const bmiInfo = useMemo(() => {
@@ -77,6 +113,7 @@ export default function ClientOnboardPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          token: token || '',
           name: name.trim(),
           phone: phone.trim(),
           instagram_handle: instagram.trim(),
@@ -112,13 +149,86 @@ export default function ClientOnboardPage() {
     }
   };
 
-  // WhatsApp link for client to ping Dajish after submission directly to his phone
   const thankYouWhatsAppUrl = `https://wa.me/919895568068?text=${encodeURIComponent(
     `Hi Coach Dajish! I just submitted my diet & fitness assessment form on FitTrack (${name}). Looking forward to starting my personalized diet plan!`
   )}`;
-  const instagramProfileUrl = 'https://www.instagram.com/dajishmohan/';
   const instagramDmUrl = 'https://ig.me/m/dajishmohan';
 
+  // 1. Loading/Checking Screen
+  if (tokenStatus === 'checking') {
+    return (
+      <div className="min-h-screen py-16 px-4 flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-slate-400 text-sm">Verifying invitation link...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Used, Expired, Invalid, or Missing Token Screen
+  if (tokenStatus === 'used' || tokenStatus === 'expired' || tokenStatus === 'invalid' || tokenStatus === 'missing') {
+    const isUsed = tokenStatus === 'used';
+    const isMissing = tokenStatus === 'missing';
+
+    return (
+      <div className="min-h-screen py-12 px-4 flex items-center justify-center">
+        <div className="max-w-md w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 text-center space-y-6 shadow-2xl animate-in">
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto ring-8 ${
+            isUsed ? 'bg-amber-500/20 text-amber-400 ring-amber-500/10' : 'bg-red-500/20 text-red-400 ring-red-500/10'
+          }`}>
+            {isUsed ? '🔒' : isMissing ? '📋' : '⚠️'}
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-slate-100">
+              {isUsed
+                ? 'Invitation Already Used'
+                : isMissing
+                ? 'Personalized Invite Required'
+                : 'Invitation Link Expired'}
+            </h2>
+            <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              {isUsed
+                ? 'This personalized intake link has already been submitted and is now closed to prevent duplicate submissions and protect your data.'
+                : isMissing
+                ? 'Client intake is strictly invitation-only to ensure 1-on-1 personalized attention. Please contact Coach Dajish Mohan to receive your personal one-time link.'
+                : tokenError || 'This invitation link is no longer valid or has passed its expiration date.'}
+            </p>
+          </div>
+
+          <div className="p-3.5 bg-[var(--bg-tertiary)] rounded-xl border border-[var(--border)] text-left text-xs text-slate-400 space-y-1.5">
+            <div className="font-semibold text-slate-200">Need a fresh invite link?</div>
+            <p className="text-[11px] text-slate-400 leading-normal">
+              Message Coach Dajish Mohan directly and he will send you a brand new one-time link in seconds.
+            </p>
+          </div>
+
+          <div className="space-y-2.5 pt-1">
+            <a
+              href="https://wa.me/919895568068?text=Hi%20Coach%20Dajish!%20Could%20you%20please%20send%20me%20a%20new%20diet%20intake%20invitation%20link%3F"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-primary w-full justify-center text-sm py-3 bg-emerald-600 hover:bg-emerald-500 font-bold"
+            >
+              💬 Request Link on WhatsApp (+91 98955 68068)
+            </a>
+
+            <a
+              href={instagramDmUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary w-full justify-center text-xs py-2.5 border-pink-500/30 text-pink-400 hover:bg-pink-500/10 font-semibold"
+            >
+              📸 Message on Instagram (@dajishmohan)
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Submitted Success Screen
   if (submitted) {
     return (
       <div className="min-h-screen py-12 px-4 flex items-center justify-center">
@@ -151,12 +261,12 @@ export default function ClientOnboardPage() {
               </div>
             )}
             <div className="flex justify-between">
-              <span>Standard Rate:</span>
-              <span className="font-semibold text-slate-200">₹2,500</span>
+              <span>Standard Plan Fee:</span>
+              <span className="font-semibold text-slate-200">₹{customRate}</span>
             </div>
             <div className="flex justify-between">
-              <span>Coach Contact:</span>
-              <span className="text-slate-200 font-medium">+91 98955 68068</span>
+              <span>Invitation Status:</span>
+              <span className="text-emerald-400 font-semibold">✓ Completed &amp; Closed</span>
             </div>
             <div className="flex justify-between">
               <span>Next Step:</span>
@@ -192,6 +302,7 @@ export default function ClientOnboardPage() {
     );
   }
 
+  // 4. Valid Invitation Form Screen
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 flex justify-center">
       <div className="max-w-2xl w-full space-y-6">
@@ -209,6 +320,11 @@ export default function ClientOnboardPage() {
           <p className="text-sm text-slate-400 max-w-lg mx-auto leading-relaxed">
             Fill in your details below so Coach <span className="text-slate-200 font-semibold">Dajish Mohan</span> can formulate your 100% custom diet plan tailored to your lifestyle and metabolism.
           </p>
+
+          {/* Invitation Security Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-300 text-xs font-medium">
+            <span>🔒 Single-Use VIP Invitation Verified</span>
+          </div>
 
           {/* Direct Coach Contact Pills */}
           <div className="flex flex-wrap items-center justify-center gap-3 pt-1 text-xs">
@@ -353,7 +469,7 @@ export default function ClientOnboardPage() {
                   2
                 </span>
                 <h2 className="text-base font-semibold text-slate-200">
-                  Body Measurements & Health Stats
+                  Body Measurements &amp; Health Stats
                 </h2>
               </div>
             </div>
@@ -481,7 +597,7 @@ export default function ClientOnboardPage() {
                 4
               </span>
               <h2 className="text-base font-semibold text-slate-200">
-                Dietary Preferences & Routine
+                Dietary Preferences &amp; Routine
               </h2>
             </div>
 
@@ -517,7 +633,7 @@ export default function ClientOnboardPage() {
             {/* Activity Level */}
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-2">
-                Daily Activity & Workout Routine
+                Daily Activity &amp; Workout Routine
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {[
@@ -626,8 +742,8 @@ export default function ClientOnboardPage() {
               </div>
             </div>
             <div className="text-right shrink-0">
-              <div className="text-base font-extrabold text-emerald-400">₹2,500</div>
-              <div className="text-[10px] text-slate-500">Standard Plan Fee</div>
+              <div className="text-base font-extrabold text-emerald-400">₹{customRate}</div>
+              <div className="text-[10px] text-slate-500">Agreed Plan Fee</div>
             </div>
           </div>
 
@@ -673,5 +789,13 @@ export default function ClientOnboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ClientOnboardPage() {
+  return (
+    <Suspense fallback={<div className="p-12 text-center text-slate-400">Loading intake assessment...</div>}>
+      <OnboardContent />
+    </Suspense>
   );
 }

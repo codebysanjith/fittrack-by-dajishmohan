@@ -85,6 +85,18 @@ function initializeDb(database: Database.Database) {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS invite_tokens (
+      id TEXT PRIMARY KEY,
+      token TEXT UNIQUE NOT NULL,
+      client_name TEXT DEFAULT '',
+      custom_rate REAL DEFAULT 2500,
+      status TEXT CHECK(status IN ('active', 'used', 'expired')) DEFAULT 'active',
+      created_at TEXT DEFAULT (datetime('now')),
+      expires_at TEXT,
+      used_at TEXT,
+      used_by_client_id TEXT REFERENCES clients(id) ON DELETE SET NULL
+    );
+
     CREATE INDEX IF NOT EXISTS idx_health_client ON health_metrics(client_id);
     CREATE INDEX IF NOT EXISTS idx_diet_client ON diet_plans(client_id);
     CREATE INDEX IF NOT EXISTS idx_payments_client ON payments(client_id);
@@ -92,6 +104,8 @@ function initializeDb(database: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_followups_date ON follow_ups(follow_up_date);
     CREATE INDEX IF NOT EXISTS idx_followups_status ON follow_ups(status);
     CREATE INDEX IF NOT EXISTS idx_clients_status ON clients(status);
+    CREATE INDEX IF NOT EXISTS idx_invite_tokens_token ON invite_tokens(token);
+    CREATE INDEX IF NOT EXISTS idx_invite_tokens_status ON invite_tokens(status);
   `);
 
   // Safely ensure new columns exist in existing tables

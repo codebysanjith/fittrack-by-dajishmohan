@@ -8,12 +8,50 @@ export async function POST(request: NextRequest) {
 
     const name = (body.name || '').trim();
     const phone = (body.phone || '').trim();
+    const token = (body.token || '').trim();
 
     if (!name || !phone) {
       return NextResponse.json(
         { error: 'Name and Phone number are required' },
         { status: 400 }
       );
+    }
+
+    // Validate single-use invite token if provided or required
+    let inviteId: string | null = null;
+    let customRate = 2500;
+
+    if (token) {
+      const invite = db
+        .prepare('SELECT * FROM invite_tokens WHERE token = ?')
+        .get(token) as { id: string; status: string; expires_at: string; custom_rate: number } | undefined;
+
+      if (!invite) {
+        return NextResponse.json(
+          { error: 'This invitation link is invalid or does not exist.' },
+          { status: 404 }
+        );
+      }
+
+      if (invite.status === 'used') {
+        return NextResponse.json(
+          { error: 'This invitation link has already been used and cannot be reused.' },
+          { status: 410 }
+        );
+      }
+
+      if (invite.expires_at && new Date() > new Date(invite.expires_at)) {
+        db.prepare("UPDATE invite_tokens SET status = 'expired' WHERE id = ?").run(invite.id);
+        return NextResponse.json(
+          { error: 'This invitation link has expired. Please contact Coach Dajish Mohan for a new invite.' },
+          { status: 410 }
+        );
+      }
+
+      inviteId = invite.id;
+      if (invite.custom_rate) {
+        customRate = invite.custom_rate;
+      }
     }
 
     const clientId = crypto.randomUUID();
@@ -73,8 +111,11 @@ export async function POST(request: NextRequest) {
       noteLines.push(`• Extra Notes: ${body.additional_notes}`);
     }
 
+    if (token) {
+      noteLines.push(`• Single-Use Invite Token: ${token}`);
+    }
+
     const notes = noteLines.join('\n');
-    const customRate = 2500; // Base standard rate
 
     // Insert client into database
     const insertClient = db.prepare(`
@@ -98,6 +139,15 @@ export async function POST(request: NextRequest) {
       now,
       now
     );
+
+    // Atomically mark invite token as used so it cannot ever be used again
+    if (inviteId) {
+      db.prepare(`
+        UPDATE invite_tokens
+        SET status = 'used', used_at = ?, used_by_client_id = ?
+        WHERE id = ?
+      `).run(now, clientId, inviteId);
+    }
 
     // If weight and height provided, insert health metrics & calculate BMI
     const weight = body.weight_kg ? parseFloat(body.weight_kg) : null;
