@@ -13,19 +13,19 @@ const promoTemplates = [
     id: 'gym_opening',
     title: '🏋️‍♂️ Gym Launch & VIP Invite',
     desc: 'Invite past & current clients to Coach Dajish Mohan\'s new gym with exclusive founder rates',
-    message: "Hey {name}! 🏋️‍♂️ Big news — Coach Dajish Mohan here! I'm opening my brand new fitness space and gym soon. As someone who's worked with me, I want to personally invite you over for our exclusive VIP opening week with special founder membership rates. Would you love to drop by?",
+    message: "Hey {name}! 🏋️‍♂️ Big news — Coach Dajish Mohan here! I'm opening my brand new fitness space and gym soon. As someone who's worked with me, I want to personally invite you over for our exclusive VIP opening week with special founder membership rates. DM me on Instagram @dajishmohan or reply here if you'd love to drop by!",
   },
   {
     id: 'diet_batch',
     title: '🥗 New Diet & Transformation Batch',
     desc: 'Promote new diet plan slots (₹2,500 standard fee)',
-    message: "Hey {name}! 👋 Coach Dajish Mohan here. I'm taking in 5 new clients for this month's personalized diet transformation batch. Full customized nutrition, weekly WhatsApp check-ins, and health metric tracking. Let me know if you want to jump back in!",
+    message: "Hey {name}! 👋 Coach Dajish Mohan here. I'm taking in 5 new clients for this month's personalized diet transformation batch. Full customized nutrition, weekly WhatsApp check-ins (+91 98955 68068), and health metric tracking. Let me know if you want to jump back in!",
   },
   {
     id: 'reengage',
     title: '🔄 Past Client Re-engagement',
     desc: 'Reach out to clients who stopped after 1 session',
-    message: "Hey {name}! Coach Dajish Mohan checking in. Just wanted to see how your fitness and diet journey has been going since our last session! How are your energy and health goals feeling?",
+    message: "Hey {name}! Coach Dajish Mohan checking in. Just wanted to see how your fitness and diet journey has been going since our last session! How are your energy and health goals feeling? You can always check my daily tips on Instagram @dajishmohan.",
   },
   {
     id: 'custom',

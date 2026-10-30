@@ -112,10 +112,12 @@ export default function ClientOnboardPage() {
     }
   };
 
-  // WhatsApp link for client to ping Dajish after submission
-  const thankYouWhatsAppUrl = `https://wa.me/?text=${encodeURIComponent(
+  // WhatsApp link for client to ping Dajish after submission directly to his phone
+  const thankYouWhatsAppUrl = `https://wa.me/919895568068?text=${encodeURIComponent(
     `Hi Coach Dajish! I just submitted my diet & fitness assessment form on FitTrack (${name}). Looking forward to starting my personalized diet plan!`
   )}`;
+  const instagramProfileUrl = 'https://www.instagram.com/dajishmohan/';
+  const instagramDmUrl = 'https://ig.me/m/dajishmohan';
 
   if (submitted) {
     return (
@@ -153,21 +155,35 @@ export default function ClientOnboardPage() {
               <span className="font-semibold text-slate-200">₹2,500</span>
             </div>
             <div className="flex justify-between">
+              <span>Coach Contact:</span>
+              <span className="text-slate-200 font-medium">+91 98955 68068</span>
+            </div>
+            <div className="flex justify-between">
               <span>Next Step:</span>
-              <span className="text-slate-300">Coach review & WhatsApp contact</span>
+              <span className="text-slate-300">Coach review &amp; WhatsApp contact</span>
             </div>
           </div>
 
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2.5 pt-2">
             <a
               href={thankYouWhatsAppUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn btn-primary w-full justify-center text-base py-3.5 bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30"
+              className="btn btn-primary w-full justify-center text-base py-3.5 bg-emerald-600 hover:bg-emerald-500 shadow-lg shadow-emerald-600/30 font-bold"
             >
               💬 Ping Coach Dajish on WhatsApp
             </a>
-            <p className="text-[11px] text-slate-500">
+
+            <a
+              href={instagramDmUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn-secondary w-full justify-center text-sm py-3 border-pink-500/30 text-pink-400 hover:bg-pink-500/10 font-semibold"
+            >
+              📸 Message on Instagram (@dajishmohan)
+            </a>
+
+            <p className="text-[11px] text-slate-500 pt-1">
               Coach Dajish Mohan will reach out to you within a few hours.
             </p>
           </div>
@@ -188,11 +204,33 @@ export default function ClientOnboardPage() {
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 tracking-tight">
-            Personalized Diet & Fitness Intake
+            Personalized Diet &amp; Fitness Intake
           </h1>
           <p className="text-sm text-slate-400 max-w-lg mx-auto leading-relaxed">
             Fill in your details below so Coach <span className="text-slate-200 font-semibold">Dajish Mohan</span> can formulate your 100% custom diet plan tailored to your lifestyle and metabolism.
           </p>
+
+          {/* Direct Coach Contact Pills */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-1 text-xs">
+            <a
+              href="https://wa.me/919895568068"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 hover:bg-emerald-500/20 font-medium transition-colors"
+            >
+              <span>💬 WhatsApp:</span>
+              <span className="font-bold">+91 98955 68068</span>
+            </a>
+            <a
+              href="https://www.instagram.com/dajishmohan/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-pink-500/10 border border-pink-500/25 text-pink-400 hover:bg-pink-500/20 font-medium transition-colors"
+            >
+              <span>📸 Instagram:</span>
+              <span className="font-bold">@dajishmohan</span>
+            </a>
+          </div>
         </div>
 
         {/* Error Alert */}
@@ -611,9 +649,28 @@ export default function ClientOnboardPage() {
         </form>
 
         {/* Footer */}
-        <p className="text-center text-xs text-slate-500 pb-8">
-          FitTrack By Dajish Mohan • Your information is strictly private and kept confidential.
-        </p>
+        <div className="text-center text-xs text-slate-500 pb-8 space-y-2">
+          <p>FitTrack By Dajish Mohan • Your information is strictly private and kept confidential.</p>
+          <div className="flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400">
+            <a
+              href="https://wa.me/919895568068"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-emerald-400 transition-colors"
+            >
+              💬 WhatsApp: +91 98955 68068
+            </a>
+            <span>•</span>
+            <a
+              href="https://www.instagram.com/dajishmohan/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-pink-400 transition-colors"
+            >
+              📸 Instagram: @dajishmohan
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );

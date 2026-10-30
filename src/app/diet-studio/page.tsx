@@ -977,6 +977,13 @@ function DietStudioContent() {
                       Weight Loss Expert | Transformation Coach
                     </p>
 
+                    {/* Direct Contact info */}
+                    <div className="flex items-center gap-2 mt-1 text-[9.5px] font-bold text-slate-700">
+                      <span className="text-emerald-700">💬 +91 98955 68068</span>
+                      <span className="text-slate-300">•</span>
+                      <span className="text-pink-700">📸 @dajishmohan</span>
+                    </div>
+
                     {/* 4 Feature Badges */}
                     <div className="flex items-center gap-2.5 mt-2 text-[9px] text-slate-700 font-medium">
                       <span className="flex items-center gap-1">

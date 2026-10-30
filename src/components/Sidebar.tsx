@@ -152,8 +152,8 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      {/* Quick Add Button */}
-      <div className="p-4 border-t border-[var(--border)]">
+      {/* Quick Add Button & Coach Info */}
+      <div className="p-4 border-t border-[var(--border)] space-y-3">
         <Link
           href="/clients?new=true"
           className="btn btn-primary w-full justify-center"
@@ -163,6 +163,26 @@ export default function Sidebar() {
           </svg>
           Add Client
         </Link>
+
+        <div className="pt-2 border-t border-[var(--border)] text-[11px] space-y-1">
+          <div className="text-[10px] uppercase font-bold text-slate-400">Coach Direct Links</div>
+          <a
+            href="https://wa.me/919895568068"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors"
+          >
+            <span>💬</span> +91 98955 68068
+          </a>
+          <a
+            href="https://www.instagram.com/dajishmohan/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 text-pink-400 hover:text-pink-300 transition-colors"
+          >
+            <span>📸</span> @dajishmohan
+          </a>
+        </div>
       </div>
     </aside>
   );

@@ -219,10 +219,28 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <a
+            href="https://wa.me/919895568068"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-sm text-xs py-1.5 px-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 flex items-center gap-1.5"
+            title="Open Coach WhatsApp"
+          >
+            <span>💬 +91 98955 68068</span>
+          </a>
+          <a
+            href="https://www.instagram.com/dajishmohan/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-sm text-xs py-1.5 px-3 bg-pink-500/10 border border-pink-500/30 text-pink-400 hover:bg-pink-500/20 flex items-center gap-1.5"
+            title="Open Coach Instagram Profile"
+          >
+            <span>📸 @dajishmohan</span>
+          </a>
           <button
             onClick={copyFormLink}
-            className="btn btn-sm btn-primary text-xs py-2 px-3.5 flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
+            className="btn btn-sm btn-primary text-xs py-1.5 px-3.5 flex items-center gap-1.5 shadow-md shadow-emerald-500/20"
           >
             <span>🔗</span>
             <span>{formCopied ? '✓ Link Copied!' : 'Share Client Form'}</span>
