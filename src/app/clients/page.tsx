@@ -7,6 +7,7 @@ import type { Client, ClientSource, ClientStatus } from "@/lib/types";
 import SingleUseInviteModal from "@/components/SingleUseInviteModal";
 import EditClientModal from "@/components/EditClientModal";
 import DeleteClientModal from "@/components/DeleteClientModal";
+import ThemeToggle from "@/components/ThemeToggle";
 
 // ─── Helpers ──────────────────────────────────────────────
 
@@ -725,6 +726,8 @@ function ClientsContent() {
             <button onClick={openModal} className="btn btn-primary btn-sm inline-flex items-center gap-1">
               <span>+</span> Add Client
             </button>
+
+            <ThemeToggle variant="icon" />
           </div>
         </div>
 

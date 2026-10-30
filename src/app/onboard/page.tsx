@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
+import ThemeToggle from '@/components/ThemeToggle';
 
 type FitnessGoal = 'fat_loss' | 'muscle_gain' | 'recomposition' | 'general_health';
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'very_active';
@@ -172,7 +173,10 @@ function OnboardContent() {
     const isMissing = tokenStatus === 'missing';
 
     return (
-      <div className="min-h-screen py-12 px-4 flex items-center justify-center">
+      <div className="min-h-screen py-12 px-4 flex flex-col items-center justify-center">
+        <div className="w-full max-w-md flex justify-end mb-3">
+          <ThemeToggle variant="pill" />
+        </div>
         <div className="max-w-md w-full bg-[var(--bg-secondary)] border border-[var(--border)] rounded-2xl p-6 sm:p-8 text-center space-y-6 shadow-2xl animate-in">
           <div className={`w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto ring-8 ${
             isUsed ? 'bg-amber-500/20 text-amber-400 ring-amber-500/10' : 'bg-red-500/20 text-red-400 ring-red-500/10'
@@ -306,8 +310,22 @@ function OnboardContent() {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6 flex justify-center">
       <div className="max-w-2xl w-full space-y-6">
+        {/* Top Bar with Theme Switcher */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-700 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+              ⚡
+            </div>
+            <div>
+              <span className="font-bold text-sm text-[var(--text-primary)]">FitTrack</span>
+              <span className="text-[10px] block text-[var(--text-muted)] font-medium">By Dajish Mohan</span>
+            </div>
+          </div>
+          <ThemeToggle variant="pill" />
+        </div>
+
         {/* Brand Header */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-3 pt-2">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
             <span>⚡ FitTrack</span>
             <span className="text-slate-500">•</span>

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import type { DashboardStats, FollowUpWithClient, Client, FollowUpType } from '@/lib/types';
 import SingleUseInviteModal from '@/components/SingleUseInviteModal';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface DashboardData {
   stats: DashboardStats;
@@ -248,6 +249,7 @@ export default function DashboardPage() {
             <span>🔒</span>
             <span>Single-Use Client Form</span>
           </button>
+          <ThemeToggle variant="pill" />
         </div>
       </div>
 

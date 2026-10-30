@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const navItems = [
   {
@@ -80,18 +81,20 @@ export default function Sidebar() {
 
   return (
     <aside className="hidden md:flex flex-col w-64 border-r border-[var(--border)] bg-[var(--bg-secondary)] shrink-0">
-      {/* Logo */}
-      <div className="p-6 border-b border-[var(--border)]">
+      {/* Logo & Theme Toggle */}
+      <div className="p-5 border-b border-[var(--border)] space-y-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
+          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700 text-white flex items-center justify-center font-bold text-lg shadow-sm">
+            ⚡
           </div>
           <div>
-            <h1 className="text-base font-bold text-[var(--text-primary)] leading-tight">FitTrack</h1>
-            <p className="text-xs font-semibold text-emerald-400">By Dajish Mohan</p>
+            <h1 className="text-base font-bold text-[var(--text-primary)] leading-tight tracking-tight">FitTrack</h1>
+            <p className="text-xs font-semibold text-[var(--text-muted)]">By Dajish Mohan</p>
           </div>
+        </div>
+
+        <div className="pt-1">
+          <ThemeToggle variant="pill" className="w-full justify-between px-2" />
         </div>
       </div>
 
